@@ -10,7 +10,7 @@ Android异步http库，基于HttpURLConnection。
 
 ```java
 Request request = new Request(Method.GET);
-request.url("http://xxx.xxx.com");
+request.url("http://xxx.xxx.com/xxx");
 AsyncHttpClient client = new AsyncHttpClient();
 client.doRequest(request, new TextResponseHandler() {
 
@@ -30,7 +30,7 @@ client.doRequest(request, new TextResponseHandler() {
 
 ```java
 Request request = new Request(Method.POST);
-request.url("http://xxx.xxx.com").put("name", "Tom").put("age", 12);
+request.url("http://xxx.xxx.com/xxx").put("name", "Tom").put("age", 12);
 AsyncHttpClient client = new AsyncHttpClient();
 client.doRequest(request, new JsonObjectResponseHandler() {
 
@@ -52,7 +52,7 @@ client.doRequest(request, new JsonObjectResponseHandler() {
 ```java
 File file = new File("/sdcard/asd12348.apk");
 Request request = new Request(Method.GET);
-request.url(""http://xxx.xxx.com"");
+request.url("http://xxx.xxx.com/xxx);
 
 client.doRequest(request, new FileResponseHandler(file) {
 
