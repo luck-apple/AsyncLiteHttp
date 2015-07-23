@@ -1,7 +1,6 @@
 # AsyncLiteHttp
 Android异步http库，基于HttpURLConnection。
 
-## 特点
 * 支持GET，POST
 * 支持文件上传和文件下载
 * 支持异步和同步
