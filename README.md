@@ -51,11 +51,10 @@ client.doRequest(request, new JsonObjectResponseHandler() {
 
 ```java
 File file = new File("/sdcard/asd12348.apk");
-String url = "http://res.gk.sdo.com/Apk/GeakSyncMobile_1.7.2.1.apk";
 Request request = new Request(Method.GET);
-request.url(url);
+request.url(""http://xxx.xxx.com"");
 
-mClient.doRequest(request, new FileResponseHandler(file) {
+client.doRequest(request, new FileResponseHandler(file) {
 
     @Override
     public void onSuccess(File file) {
