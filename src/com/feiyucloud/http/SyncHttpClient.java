@@ -1,27 +1,15 @@
 package com.feiyucloud.http;
 
-import com.feiyucloud.http.Request.Method;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class SyncHttpClient {
     private int connectionTimeout = 20000;
     private int dataRetrievalTimeout = 20000;
     private boolean followRedirects = true;
-
-    private final Map<String, String> headers;
-    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.0";
-
-    public SyncHttpClient() {
-        headers = Collections.synchronizedMap(new LinkedHashMap<String, String>());
-        setUserAgent(DEFAULT_USER_AGENT);
-    }
 
     public int getConnectionTimeout() {
         return connectionTimeout;
@@ -47,25 +35,9 @@ public class SyncHttpClient {
         this.followRedirects = followRedirects;
     }
 
-    public void setHeader(String name, String value) {
-        headers.put(name, value);
-    }
-
-    public void removeHeader(String name) {
-        headers.remove(name);
-    }
-
-    public String getUserAgent() {
-        return headers.get("User-Agent");
-    }
-
-    public void setUserAgent(String userAgent) {
-        headers.put("User-Agent", userAgent);
-    }
-
     public void doRequest(final Request request, final ResponseHandler handler) {
         HttpURLConnection connection = null;
-        Method method = request.getMethod();
+        Request.Method method = request.getMethod();
         String url = request.getUrl();
 
         try {
@@ -81,6 +53,7 @@ public class SyncHttpClient {
             connection.setDoInput(true);
 
             // Headers
+            Map<String, String> headers = request.getHeaders();
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
@@ -89,7 +62,7 @@ public class SyncHttpClient {
 
             // Request Body
             // POST and PUT expect an output body.
-            if (method == Method.POST) {
+            if (method == Request.Method.POST) {
                 connection.setDoOutput(true);
                 if (request.hasFiles()) {
                     // Use multipart/form-data to send fields and files

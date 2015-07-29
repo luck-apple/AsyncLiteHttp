@@ -1,5 +1,7 @@
 package com.feiyucloud.http;
 
+import android.os.Looper;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,7 +17,9 @@ public class AsyncHttpClient extends SyncHttpClient {
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
+                Looper.prepare();
                 AsyncHttpClient.super.doRequest(request, handler);
+                Looper.loop();
             }
         });
     }
