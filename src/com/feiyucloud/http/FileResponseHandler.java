@@ -66,7 +66,7 @@ public abstract class FileResponseHandler extends ResponseHandler {
             while ((len = instream.read(tmp)) != -1 && !Thread.currentThread().isInterrupted()) {
                 count += len;
                 fos.write(tmp, 0, len);
-                onProgress(count, contentLength);
+                sendProgressMessage(count, contentLength);
             }
         } finally {
             fos.flush();
