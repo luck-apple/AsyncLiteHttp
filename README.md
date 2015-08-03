@@ -47,13 +47,12 @@ client.doRequest(request, new JsonObjectResponseHandler() {
 ```
 
 
-* 下载 
+* 下载
 
 ```java
 File file = new File("/sdcard/asd12348.apk");
 Request request = new Request(Method.GET);
 request.url("http://xxx.xxx.com/xxx);
-
 client.doRequest(request, new FileResponseHandler(file) {
 
     @Override
