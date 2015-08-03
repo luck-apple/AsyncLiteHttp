@@ -1,8 +1,16 @@
+# OSX
 .DS_Store
-bin/
-gen/
-.classpath
-.project
-.settings/
-obj/
-proguard/
+
+# Github
+gh-pages
+
+# Gradle
+.gradle
+build
+
+# IDEA
+*.iml
+*.ipr
+*.iws
+out
+.idea
