@@ -4,15 +4,20 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class AsyncHttpClient {
+    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.0";
+
     private final ExecutorService threadPool;
     private int connectionTimeout = 20000;
     private int dataRetrievalTimeout = 20000;
     private boolean followRedirects = true;
+    private Map<String, String> headers;
 
     public int getConnectionTimeout() {
         return connectionTimeout;
@@ -40,6 +45,24 @@ public class AsyncHttpClient {
 
     public AsyncHttpClient() {
         threadPool = Executors.newCachedThreadPool();
+        headers = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+        setUserAgent(DEFAULT_USER_AGENT);
+    }
+
+    public String getUserAgent() {
+        return headers.get("User-Agent");
+    }
+
+    public void setUserAgent(String userAgent) {
+        headers.put("User-Agent", userAgent);
+    }
+
+    public void setHeader(String name, String value) {
+        headers.put(name, value);
+    }
+
+    public void removeHeader(String name) {
+        headers.remove(name);
     }
 
     public void doRequest(final Request request, final ResponseHandler handler) {
@@ -69,7 +92,6 @@ public class AsyncHttpClient {
             connection.setDoInput(true);
 
             // Headers
-            Map<String, String> headers = request.getHeaders();
             for (Map.Entry<String, String> header : headers.entrySet()) {
                 connection.setRequestProperty(header.getKey(), header.getValue());
             }
@@ -102,9 +124,6 @@ public class AsyncHttpClient {
             // Process the response in the handler because it can be done in
             // different ways
             handler.processResponse(connection);
-            // Request finished
-            handler.sendFinishMessage();
-
         } catch (IOException e) {
             handler.sendFailureMessage(e);
         } finally {
@@ -112,7 +131,9 @@ public class AsyncHttpClient {
                 connection.disconnect();
                 connection = null;
             }
+            // Request finished
+            handler.sendFinishMessage();
         }
-
     }
+
 }
