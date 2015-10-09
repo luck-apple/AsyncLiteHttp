@@ -6,10 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import com.feiyucloud.http.AsyncHttpClient;
 import com.feiyucloud.http.FileResponseHandler;
+import com.feiyucloud.http.AsyncHttpClient;
 import com.feiyucloud.http.JsonObjectResponseHandler;
-import com.feiyucloud.http.Request;
 import com.feiyucloud.http.TextResponseHandler;
 
 import org.json.JSONObject;
@@ -62,25 +61,41 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void getText() {
-        Request req = new Request(Request.Method.GET);
-        req.url("http://mm.gk.sdo.com/Rest/MobileMarketFacade/AppGetDetail?format=json&packname=com.geak.mobile.sync");
-        mClient.doRequest(req, new TextResponseHandler() {
+        new Thread(new Runnable() {
             @Override
-            public void onSuccess(String response) {
-                log(response);
-            }
+            public void run() {
 
-            @Override
-            public void onFailure(Throwable e) {
-                log(e.getMessage());
+
+                log("getText");
+                String url = "http://mm.gk.sdo.com/Rest/MobileMarketFacade/AppGetDetail?format=json&packname=com.geak.mobile.sync";
+                mClient.get(url, new TextResponseHandler() {
+                    @Override
+                    public void onStart() {
+                        log("getText: onStart");
+                    }
+
+                    @Override
+                    public void onFinish() {
+                        log("getText: onFinish");
+                    }
+
+                    @Override
+                    public void onSuccess(String response) {
+                        log("getText onSuccess:" + response);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable e) {
+                        log(e.getMessage());
+                    }
+                });
             }
-        });
+        }).start();
     }
 
     private void getJson() {
-        Request req = new Request(Request.Method.GET);
-        req.url("http://mm.gk.sdo.com/Rest/MobileMarketFacade/AppGetDetail?format=json&packname=com.geak.mobile.sync");
-        mClient.doRequest(req, new JsonObjectResponseHandler() {
+        String url = "http://mm.gk.sdo.com/Rest/MobileMarketFacade/AppGetDetail?format=json&packname=com.geak.mobile.sync";
+        mClient.get(url, new JsonObjectResponseHandler() {
             @Override
             public void onSuccess(JSONObject response) {
                 log(response.toString());
@@ -94,9 +109,9 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void postText() {
-        Request req = new Request(Request.Method.POST);
-        req.url("http://client.azrj.cn/json/cook/cook_list.jsp?type=1&p=2&size=10");
-        mClient.doRequest(req, new TextResponseHandler() {
+        String url = "http://sdk.feiyucloud.com/accountau/accountstatus!getAccountOnlineStatus.action";
+
+        mClient.post(url, null, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
                 log(response);
@@ -110,9 +125,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void postJson() {
-        Request req = new Request(Request.Method.POST);
-        req.url("http://sdk.feiyucloud.com/accountau/accountstatus!getAccountOnlineStatus.action");
-        mClient.doRequest(req, new JsonObjectResponseHandler() {
+        String url = "http://sdk.feiyucloud.com/accountau/accountstatus!getAccountOnlineStatus.action";
+        mClient.post(url, null, new JsonObjectResponseHandler() {
             @Override
             public void onSuccess(JSONObject response) {
                 log(response.toString());
@@ -132,10 +146,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     private void download() {
         File file = new File("/sdcard/asd12345.apk");
         String url = "http://res.gk.sdo.com/Apk/GeakSyncMobile_1.7.2.1.apk";
-        Request params = new Request(Request.Method.GET);
-        params.url(url);
-        AsyncHttpClient client = new AsyncHttpClient();
-        client.doRequest(params, new FileResponseHandler(file) {
+        mClient.get(url, new FileResponseHandler(file) {
 
             @Override
             public void onSuccess(File file) {
@@ -183,7 +194,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void log(String msg) {
-        Log.d("asd", msg);
+        Log.d("asd", "" + msg);
     }
 
 

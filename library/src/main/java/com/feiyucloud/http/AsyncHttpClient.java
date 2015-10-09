@@ -2,22 +2,34 @@ package com.feiyucloud.http;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Created by ting on 15/10/9.
+ */
 public class AsyncHttpClient {
-    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.0";
-
-    private final ExecutorService threadPool;
-    private int connectionTimeout = 20000;
-    private int dataRetrievalTimeout = 20000;
+    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.1";
+    public static final String UTF8 = "UTF-8";
+    private int connectionTimeout = 30000;
+    private int dataRetrievalTimeout = 30000;
     private boolean followRedirects = true;
     private Map<String, String> headers;
+    private final ExecutorService threadPool;
+
+    public AsyncHttpClient() {
+        threadPool = Executors.newCachedThreadPool();
+        headers = Collections.synchronizedMap(new LinkedHashMap<String, String>());
+        setUserAgent(DEFAULT_USER_AGENT);
+    }
 
     public int getConnectionTimeout() {
         return connectionTimeout;
@@ -43,12 +55,6 @@ public class AsyncHttpClient {
         this.followRedirects = followRedirects;
     }
 
-    public AsyncHttpClient() {
-        threadPool = Executors.newCachedThreadPool();
-        headers = Collections.synchronizedMap(new LinkedHashMap<String, String>());
-        setUserAgent(DEFAULT_USER_AGENT);
-    }
-
     public String getUserAgent() {
         return headers.get("User-Agent");
     }
@@ -57,7 +63,7 @@ public class AsyncHttpClient {
         headers.put("User-Agent", userAgent);
     }
 
-    public void setHeader(String name, String value) {
+    public void addHeader(String name, String value) {
         headers.put(name, value);
     }
 
@@ -65,66 +71,92 @@ public class AsyncHttpClient {
         headers.remove(name);
     }
 
-    public void doRequest(final Request request, final ResponseHandler handler) {
+    private HttpURLConnection buildURLConnection(String url, Method method) throws IOException {
+        URL resourceUrl = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) resourceUrl.openConnection();
+
+        // Settings
+        connection.setConnectTimeout(connectionTimeout);
+        connection.setReadTimeout(dataRetrievalTimeout);
+        connection.setUseCaches(false);
+        connection.setInstanceFollowRedirects(followRedirects);
+        connection.setRequestMethod(method.toString());
+        connection.setDoInput(true);
+
+        // Headers
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+            connection.setRequestProperty(header.getKey(), header.getValue());
+        }
+        return connection;
+    }
+
+    private byte[] encodeParameters(Map<String, String> map) {
+        if (map == null) {
+            map = new TreeMap<>();
+        }
+        StringBuilder encodedParams = new StringBuilder();
+        try {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (encodedParams.length() > 0) {
+                    encodedParams.append("&");
+                }
+                encodedParams.append(URLEncoder.encode(entry.getKey(), UTF8));
+                encodedParams.append('=');
+                encodedParams.append(URLEncoder.encode(entry.getValue(), UTF8));
+            }
+            return encodedParams.toString().getBytes(UTF8);
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Encoding not supported: " + UTF8, e);
+        }
+    }
+
+    public void get(final String url, final ResponseHandler handler) {
         threadPool.execute(new Runnable() {
             @Override
             public void run() {
-                exeRequest(request, handler);
+                request(url, Method.GET, null, handler);
             }
         });
     }
 
-    private void exeRequest(final Request request, final ResponseHandler handler) {
-        HttpURLConnection connection = null;
-        Request.Method method = request.getMethod();
-        String url = request.getUrl();
 
-        try {
-            URL resourceUrl = new URL(url);
-            connection = (HttpURLConnection) resourceUrl.openConnection();
-
-            // Settings
-            connection.setConnectTimeout(connectionTimeout);
-            connection.setReadTimeout(dataRetrievalTimeout);
-            connection.setUseCaches(false);
-            connection.setInstanceFollowRedirects(followRedirects);
-            connection.setRequestMethod(method.toString());
-            connection.setDoInput(true);
-
-            // Headers
-            for (Map.Entry<String, String> header : headers.entrySet()) {
-                connection.setRequestProperty(header.getKey(), header.getValue());
+    public void post(final String url, final Map<String, String> map, final ResponseHandler handler) {
+        threadPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                request(url, Method.POST, map, handler);
             }
+        });
+    }
+
+    private void request(final String url, final Method method, final Map<String, String> map,
+                         final ResponseHandler handler) {
+        HttpURLConnection connection = null;
+        try {
+            connection = buildURLConnection(url, method);
+
             // Request start
             handler.sendStartMessage();
 
-            // Request Body
-            // POST and PUT expect an output body.
-            if (method == Request.Method.POST) {
-                connection.setDoOutput(true);
-                if (request.hasFiles()) {
-                    // Use multipart/form-data to send fields and files
-                    // 32kb at a time
-                    connection.setChunkedStreamingMode(32 * 1024);
-                    MultipartWriter.write(connection, request);
-                } else {
-                    // Send content as form-urlencoded
-                    byte[] content = request.encodeParameters();
-                    connection.setRequestProperty("Content-Type",
-                            "application/x-www-form-urlencoded;charset=" + Request.UTF8);
-                    connection.setRequestProperty("Content-Length", Long.toString(content.length));
-                    // Stream the data so we don't run out of memory
-                    connection.setFixedLengthStreamingMode(content.length);
-                    OutputStream os = connection.getOutputStream();
-                    os.write(content);
-                    os.flush();
-                    os.close();
-                }
+            if (method == Method.POST) {
+                // Send content as form-urlencoded
+                byte[] content = encodeParameters(map);
+                connection.setRequestProperty("Content-Type",
+                        "application/x-www-form-urlencoded;charset=" + UTF8);
+                connection.setRequestProperty("Content-Length", Long.toString(content.length));
+
+                // Stream the data so we don't run out of memory
+                connection.setFixedLengthStreamingMode(content.length);
+                OutputStream os = connection.getOutputStream();
+                os.write(content);
+                os.flush();
+                os.close();
             }
-            // Process the response in the handler because it can be done in
-            // different ways
+
+            // Process the response in the handler because it can be done in different ways
             handler.processResponse(connection);
-        } catch (IOException e) {
+
+        } catch (Exception e) {
             handler.sendFailureMessage(e);
         } finally {
             if (connection != null) {

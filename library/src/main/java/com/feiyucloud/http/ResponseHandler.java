@@ -23,7 +23,8 @@ public abstract class ResponseHandler {
     }
 
     public ResponseHandler(Looper looper) {
-        this.looper = looper == null ? Looper.myLooper() : looper;
+//        this.looper = (looper == null ? Looper.myLooper() : looper);
+        this.looper = (looper == null ? Looper.getMainLooper() : looper);
         handler = new ResponderHandler(this, this.looper);
     }
 
@@ -98,7 +99,7 @@ public abstract class ResponseHandler {
     }
 
     final protected void sendProgressMessage(long bytesWritten, long bytesTotal) {
-        handler.sendMessage(obtainMessage(MSG_PROGRESS, new Object[] { bytesWritten, bytesTotal }));
+        handler.sendMessage(obtainMessage(MSG_PROGRESS, new Object[]{bytesWritten, bytesTotal}));
     }
 
     final protected void sendSuccessMessage(byte[] responseBytes) {
