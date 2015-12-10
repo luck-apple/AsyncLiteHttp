@@ -2,18 +2,14 @@
 Android异步http库，基于HttpURLConnection。
 
 * 支持GET，POST
-* 支持文件上传和文件下载
-* 支持异步和同步
+* 支持异步和同步方式
 
-## 使用
-* GET请求
+## 异步请求使用
+* GET
 
 ```java
-Request request = new Request(Method.GET);
-request.url("http://xxx.xxx.com/xxx");
 AsyncHttpClient client = new AsyncHttpClient();
-client.doRequest(request, new TextResponseHandler() {
-
+client.doRequest("http://xxx.xxx.com/xxx", new TextResponseHandler() {
     @Override
     public void onFailure(Throwable e) {
        // TODO
@@ -26,13 +22,13 @@ client.doRequest(request, new TextResponseHandler() {
 });
 ```
 
-* POST请求
+* POST
 
 ```java
-Request request = new Request(Method.POST);
-request.url("http://xxx.xxx.com/xxx").put("name", "Tom").put("age", 12);
 AsyncHttpClient client = new AsyncHttpClient();
-client.doRequest(request, new JsonObjectResponseHandler() {
+HashMap<Stirng, String> map = new HashMap<>();
+map.put("key", "value");
+client.doRequest("http://xxx.xxx.com/xxx", map, new JsonObjectResponseHandler() {
 
     @Override
     public void onFailure(Throwable e) {
@@ -50,10 +46,8 @@ client.doRequest(request, new JsonObjectResponseHandler() {
 * 下载
 
 ```java
-File file = new File("/sdcard/asd12348.apk");
-Request request = new Request(Method.GET);
-request.url("http://xxx.xxx.com/xxx);
-client.doRequest(request, new FileResponseHandler(file) {
+File file = new File("/sdcard/xxx.apk");
+client.doRequest("http://xxx.xxx.com/xxx", new FileResponseHandler(file) {
 
     @Override
     public void onSuccess(File file) {
@@ -80,4 +74,77 @@ client.doRequest(request, new FileResponseHandler(file) {
         // TODO
     }
 });
+```
+
+## 同步请求使用
+* GET
+
+```java
+SyncHttpClient client = new SyncHttpClient();
+final String url = "http://xxx.xxx.com/xxx.action";
+new Thread(new Runnable() {
+    @Override
+    public void run() {
+        client.post(url, null, new TextResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                // TODO
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                // TODO
+            }
+        });
+
+        client.post(url, null, new TextResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                // TODO
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                // TODO
+            }
+        });
+    }
+}).start();
+```
+
+* POST
+
+```java
+SyncHttpClient client = new SyncHttpClient();
+final String url = "http://xxx.com/xxx.action";
+HashMap<Stirng, String> map = new HashMap<>();
+map.put("key", "value");
+new Thread(new Runnable() {
+    @Override
+    public void run() {
+        client.post(url, null, new TextResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                // TODO
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                // TODO
+            }
+        });
+
+        client.post(url, null, new TextResponseHandler() {
+            @Override
+            public void onSuccess(String response) {
+                // TODO
+            }
+
+            @Override
+            public void onFailure(Throwable e) {
+                // TODO
+            }
+        });
+    }
+}).start();
 ```
