@@ -83,8 +83,8 @@ client.doRequest("http://xxx.xxx.com/xxx", new FileResponseHandler(file) {
 new Thread(new Runnable() {
     @Override
     public void run() {
-    SyncHttpClient client = new SyncHttpClient();
-    String url = "http://xxx.xxx.com/xxx.action";
+        SyncHttpClient client = new SyncHttpClient();
+        String url = "http://xxx.xxx.com/xxx.action";
         client.get(url, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
@@ -106,10 +106,10 @@ new Thread(new Runnable() {
 new Thread(new Runnable() {
     @Override
     public void run() {
-    SyncHttpClient client = new SyncHttpClient();
-    String url = "http://xxx.xxx.com/xxx.action";
-    HashMap<Stirng, String> map = new HashMap<>();
-    map.put("key", "value");
+        SyncHttpClient client = new SyncHttpClient();
+        String url = "http://xxx.xxx.com/xxx.action";
+        HashMap<Stirng, String> map = new HashMap<>();
+        map.put("key", "value");
         client.post(url, map, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
