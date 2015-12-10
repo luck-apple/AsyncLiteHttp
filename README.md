@@ -80,24 +80,12 @@ client.doRequest("http://xxx.xxx.com/xxx", new FileResponseHandler(file) {
 * GET
 
 ```java
-SyncHttpClient client = new SyncHttpClient();
-final String url = "http://xxx.xxx.com/xxx.action";
 new Thread(new Runnable() {
     @Override
     public void run() {
-        client.post(url, map, new TextResponseHandler() {
-            @Override
-            public void onSuccess(String response) {
-                // TODO
-            }
-
-            @Override
-            public void onFailure(Throwable e) {
-                // TODO
-            }
-        });
-
-        client.post(url, null, new TextResponseHandler() {
+    SyncHttpClient client = new SyncHttpClient();
+    String url = "http://xxx.xxx.com/xxx.action";
+        client.get(url, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
                 // TODO
@@ -115,26 +103,14 @@ new Thread(new Runnable() {
 * POST
 
 ```java
-SyncHttpClient client = new SyncHttpClient();
-final String url = "http://xxx.xxx.com/xxx.action";
-HashMap<Stirng, String> map = new HashMap<>();
-map.put("key", "value");
 new Thread(new Runnable() {
     @Override
     public void run() {
+    SyncHttpClient client = new SyncHttpClient();
+    String url = "http://xxx.xxx.com/xxx.action";
+    HashMap<Stirng, String> map = new HashMap<>();
+    map.put("key", "value");
         client.post(url, map, new TextResponseHandler() {
-            @Override
-            public void onSuccess(String response) {
-                // TODO
-            }
-
-            @Override
-            public void onFailure(Throwable e) {
-                // TODO
-            }
-        });
-
-        client.post(url, null, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
                 // TODO
