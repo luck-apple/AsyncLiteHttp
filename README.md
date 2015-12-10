@@ -2,7 +2,7 @@
 Android异步http库，基于HttpURLConnection。
 
 * 支持GET，POST
-* 支持异步和同步方式
+* 支持异步和同步
 
 ## 异步请求使用
 * GET
@@ -85,7 +85,7 @@ final String url = "http://xxx.xxx.com/xxx.action";
 new Thread(new Runnable() {
     @Override
     public void run() {
-        client.post(url, null, new TextResponseHandler() {
+        client.post(url, map, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
                 // TODO
@@ -116,13 +116,13 @@ new Thread(new Runnable() {
 
 ```java
 SyncHttpClient client = new SyncHttpClient();
-final String url = "http://xxx.com/xxx.action";
+final String url = "http://xxx.xxx.com/xxx.action";
 HashMap<Stirng, String> map = new HashMap<>();
 map.put("key", "value");
 new Thread(new Runnable() {
     @Override
     public void run() {
-        client.post(url, null, new TextResponseHandler() {
+        client.post(url, map, new TextResponseHandler() {
             @Override
             public void onSuccess(String response) {
                 // TODO
