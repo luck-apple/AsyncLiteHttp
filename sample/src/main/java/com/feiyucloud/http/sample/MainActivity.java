@@ -17,9 +17,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.HashMap;
 
-/**
- * Created by ting on 15/7/31.
- */
 public class MainActivity extends Activity implements View.OnClickListener {
     private AsyncHttpClient mAsyncHttp;
     private SyncHttpClient mSyncHttp;
@@ -69,7 +66,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
             @Override
             public void run() {
 
-
                 log("getText");
                 String url = "http://ip.cn";
                 mAsyncHttp.get(url, new TextResponseHandler() {
@@ -93,6 +89,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
                         log(e.getMessage());
                     }
                 });
+
             }
         }).start();
     }
@@ -158,17 +155,19 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private void postJson() {
         String url = "http://sdk.feiyucloud.com/accountau/accountstatus!getAccountOnlineStatus.action";
-        mAsyncHttp.post(url, null, new JsonObjectResponseHandler() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                log(response.toString());
-            }
+        for (int i = 0; i < 8; i++) {
+            mAsyncHttp.post(url, null, new JsonObjectResponseHandler() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    log(response.toString());
+                }
 
-            @Override
-            public void onFailure(Throwable e) {
-                log(e.getMessage());
-            }
-        });
+                @Override
+                public void onFailure(Throwable e) {
+                    log(e.getMessage());
+                }
+            });
+        }
     }
 
 
@@ -176,8 +175,12 @@ public class MainActivity extends Activity implements View.OnClickListener {
     ProgressDialog dialog;
 
     private void download() {
-        File file = new File("/sdcard/asd12345.apk");
-        String url = "http://res.gk.sdo.com/Apk/GeakSyncMobile_1.7.2.1.apk";
+//        File file = new File("/sdcard/asd12345.apk");
+//        String url = "http://res.gk.sdo.com/Apk/GeakSyncMobile_1.7.2.1.apk";
+
+        File file = new File("/sdcard/aaa.png");
+        String url = "http://192.168.253.120:8086/fy-fms/file/getImage.html?systemId=pbx&fileName=2699e59a-1598-4a9f-9632-35f29f4868b7.png";
+        mAsyncHttp.addHeader("Accept-Encoding", "identity");
         mAsyncHttp.get(url, new FileResponseHandler(file) {
 
             @Override
@@ -203,6 +206,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
             @Override
             public void onProgress(long bytesReceived, long totalBytes) {
+                log("totalBytes:" + totalBytes + ", bytesReceived:" + bytesReceived);
                 int p = (int) ((totalBytes > 0) ? (bytesReceived * 1.0 / totalBytes) * 100 : -1);
                 if (p != precent) {
                     precent = p;

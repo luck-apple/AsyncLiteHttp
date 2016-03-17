@@ -68,6 +68,11 @@ public abstract class FileResponseHandler extends ResponseHandler {
                 fos.write(tmp, 0, len);
                 sendProgressMessage(count, contentLength);
             }
+            if (count == contentLength) {
+                onSuccess(getTargetFile());
+            } else {
+                onFailure(new Exception("received bytes length is not contentLength"), getTargetFile());
+            }
         } finally {
             fos.flush();
             fos.close();

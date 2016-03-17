@@ -23,7 +23,6 @@ public abstract class ResponseHandler {
     }
 
     public ResponseHandler(Looper looper) {
-//        this.looper = (looper == null ? Looper.myLooper() : looper);
         this.looper = (looper == null ? Looper.getMainLooper() : looper);
         handler = new ResponderHandler(this, this.looper);
     }

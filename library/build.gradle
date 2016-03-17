@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.3"
     }
     buildTypes {
         release {
@@ -21,3 +21,18 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
+
+ext {
+    PUBLISH_GROUP_ID = 'com.feiyucloud.http'  // 填写groupId， 一般是包名，比如：com.android.support
+    //PUBLISH_ARTIFACT_ID = '你的aritfactId'  // //这里不需要再填写，自动以Model的名字作为aritfactId
+    PUBLISH_VERSION = '1.2'   // 版本号，比如：22.2.1
+    PUBLISH_DES = 'Android Lite Http Lib'   // 库的描述尽量不要用中文
+    LIB_NAME = 'AsyncLiteHttp'    // lib名称，比如：My_Lib
+
+    WEBSITE_URL = 'https://github.com/luck-apple/AsyncLiteHttp'  // 可以填写github上的库地址.
+    ISSUE_TRACKER_URL = 'https://github.com/luck-apple/AsyncLiteHttp/issues' // 可以填写github库的issue地址.
+    VSC_URL = 'https://github.com/luck-apple/AsyncLiteHttp'    // 可以填写github上库的地址.
+}
+
+// 下面这行请勿修改
+apply from: 'https://raw.githubusercontent.com/andforce/release-android-lib-to-jcenter/master/bintray.gradle'

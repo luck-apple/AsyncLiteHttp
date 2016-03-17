@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class SyncHttpClient {
-    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.2";
+    public static final String DEFAULT_USER_AGENT = "AsyncLiteHttp/1.3";
     public static final String UTF8 = "UTF-8";
     private int connectionTimeout = 30000;
     private int dataRetrievalTimeout = 30000;
@@ -78,7 +78,7 @@ public class SyncHttpClient {
 
         // Headers
         for (Map.Entry<String, String> header : headers.entrySet()) {
-            connection.setRequestProperty(header.getKey(), header.getValue());
+            connection.setRequestProperty( header.getKey(), header.getValue());
         }
         return connection;
     }
